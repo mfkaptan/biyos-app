@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'biyos.ui'
 #
-# Created: Tue Apr 12 20:03:13 2016
+# Created: Wed Apr 13 12:09:46 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -72,5 +72,5 @@ class Ui_MainWindow(object):
         self.radioB.setText(_translate("MainWindow", "B blok", None))
         self.tekil_borc.setText(_translate("MainWindow", "Yazdır", None))
         self.label.setText(_translate("MainWindow", "Daire No:", None))
-        self.giris.setText(_translate("MainWindow", "mbkaptan@gmail.com ile giriş yap", None))
+        self.giris.setText(_translate("MainWindow", "Giriş yap", None))
 
