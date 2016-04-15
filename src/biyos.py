@@ -76,15 +76,14 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         html = self.getAccount(no)
         hesap =  html.body.find('span', attrs={'style':'font-size:22px;'}).get_text()
 
+        p1 = self.document.add_paragraph()
+        p1.style.paragraph_format.keep_together = True
+        p1.style.paragraph_format.keep_with_next = True
+        p1.style.paragraph_format.widow_control = True
         self.document.add_heading(hesap, level=1)
         self.document.add_heading(blok + " Blok / No: " + str(daire), level=2)
 
         try:
-            p = self.document.add_paragraph()
-            p.style.paragraph_format.keep_together = True
-            p.style.paragraph_format.keep_with_next = True
-            p.style.paragraph_format.widow_control = True
-
             data = html.body.find('div', attrs={'class':'table-responsive'})
             geciken = html.body.find('div', attrs={'class':'detail-payment-item text-danger big-title'})
             bakiye = html.body.find('div', attrs={'class':'detail-payment-item text-warning big-title'})
@@ -93,34 +92,36 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             return
 
     def create_table(self, data, geciken, bakiye):
-        table = data.find('table', attrs={'class':'table table-detail'})
-        table_body = table.find('tbody')
-        rows = table_body.find_all('tr')
-
-        tbl = self.document.add_table(rows=0, cols=3)
-        tbl.autofit = True
-        tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
-        tbl.style.paragraph_format.keep_together = True
-        tbl.style.paragraph_format.keep_with_next = True
-        tbl.style.paragraph_format.widow_control = True
-
-        row_cells = tbl.add_row().cells
-        row_cells[0].text = "Son Odeme Tarihi"
-        row_cells[1].text = "Aciklama"
-        row_cells[2].text = "Tutar"
-
-        for r in rows:
-            row_cells = tbl.add_row().cells
-            cols = r.find_all('td')
-            i = 0
-            for c in cols:
-                if c.text:
-                    row_cells[i].text = c.text
-                    i += 1
-
-        non_decimal = re.compile(r'[^\d.,]+')
+        p = self.document.add_paragraph()
+        p.style.paragraph_format.keep_together = True
 
         if bakiye:
+            table = data.find('table', attrs={'class':'table table-detail'})
+            table_body = table.find('tbody')
+            rows = table_body.find_all('tr')
+
+            tbl = self.document.add_table(rows=0, cols=3)
+            tbl.autofit = True
+            tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+            tbl.style.paragraph_format.keep_together = True
+            tbl.style.paragraph_format.widow_control = True
+
+            row_cells = tbl.add_row().cells
+            row_cells[0].text = "Son Odeme Tarihi"
+            row_cells[1].text = "Aciklama"
+            row_cells[2].text = "Tutar"
+
+            for r in rows:
+                row_cells = tbl.add_row().cells
+                cols = r.find_all('td')
+                i = 0
+                for c in cols:
+                    if c.text:
+                        row_cells[i].text = c.text
+                        i += 1
+
+            non_decimal = re.compile(r'[^\d.,]+')
+
             row_cells = tbl.add_row().cells
             row_cells[1].text =  "Toplam Borc"
             row_cells[2].text = non_decimal.sub('',bakiye.get_text())
@@ -139,9 +140,10 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
 
             daire = 1
             blok = "A"
-            for i in range(6149, 6151):#6196):
+            for i in range(6149, 6197):
                 p = self.document.add_paragraph()
                 p.style.paragraph_format.keep_together = True
+                p.style.paragraph_format.keep_with_next = True
                 p.add_run(bar).bold = True
 
                 self.print_single_account(i, blok, daire)
@@ -151,9 +153,14 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
                     daire = 1
                     blok = "B"
 
+                print blok, daire
+
             for k in kiraci:
                 p = self.document.add_paragraph()
+                p.style.paragraph_format.keep_together = True
+                p.style.paragraph_format.keep_with_next = True
                 p.add_run(bar).bold = True
+
                 self.print_single_account(*k)
 
             self.document.save('Tum borclar.docx')
