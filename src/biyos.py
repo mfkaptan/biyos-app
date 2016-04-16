@@ -26,8 +26,10 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.document = None
         self.giris.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
         self.giris.clicked.connect(self.login)
-        self.tum_borclar.clicked.connect(self.print_all)
-
+        self.kalori_hesap_buton.clicked.connect(self.kalori_hesapla)
+        self.kalori_veri_buton.clicked.connect(self.sayac_verileri)
+        self.apartman_aidat_buton.clicked.connect(self.apartman_aidat)
+        self.tum_borclar_buton.clicked.connect(self.print_all)
 
     def login(self):
         with open('../log.in', 'r') as f:
@@ -64,16 +66,64 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
 
         response = self.opener.open("https://app.biyos.net/login.php", login_data)
 
-    def getAccount(self, no):
-        url = 'https://app.biyos.net/hesaplar/' + str(no)
+    def sayac_verileri(self):
+        su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
+        self.su_toplam = self.get_sayac_toplam(su)
+        self.su_toplam_disp.setText(str(self.su_toplam))
+
+        kalori = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=kalorimetre')
+        self.kalori_toplam = self.get_sayac_toplam(kalori)
+        self.kalori_toplam_disp.setText(str(self.kalori_toplam))
+
+        self.kalori_ortalama = self.kalori_toplam/48.0
+        self.kalori_ortalama_disp.setText(str("%.2f" % self.kalori_ortalama))
+
+    def kalori_hesapla(self):
+        self.sayac_verileri()
+        self.dogalgaz_birim = float(self.dogalgaz_birim_in.value())
+        self.su_birim = float(self.su_birim_in.value())
+        self.fatura = float(self.fatura_in.value())
+        su_fark = (self.dogalgaz_birim - self.su_birim)*self.su_toplam
+
+        self.son_fiyat = self.fatura - su_fark
+        self.son_fiyat_disp.setText(str("%.2f" % self.son_fiyat))
+
+    def _get_tuketim(self, html):
+        table = html.body.find('table', attrs={'class': 'table'})
+        body = table.find('tbody')
+        rows = body.find_all('tr')
+
+        return rows
+
+    def get_sayac_toplam(self, html):
+        rows = self._get_tuketim
+
+        total = 0
+        for r in rows:
+            cols = r.find_all('td')
+            total += int(cols[-1].text)
+
+        return total
+
+    def get_page(self, url):
         try:
             resp = self.opener.open(url)
             return BeautifulSoup(resp.read(), "lxml")
         except Exception as e:
             raise e
 
+    def apartman_aidat(self, url=295):
+        su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
+        kalori = self.get_page('https://app.biyos.net/raporlar/paylasimlar/' + str(url))
+        title = kalori.body.find('h4', attrs={'class': 'pull-left'}).get_text().split(' ay')[0]
+        print title
+
+        su_rows = self._get_tuketim(su)
+        kalori_rows = self._get_tuketim(kalori)
+
+
     def print_single_account(self, no, blok, daire):
-        html = self.getAccount(no)
+        html = self.get_page('https://app.biyos.net/hesaplar/' + str(no))
         hesap =  html.body.find('span', attrs={'style':'font-size:22px;'}).get_text()
 
         p1 = self.document.add_paragraph()
