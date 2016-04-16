@@ -27,7 +27,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.giris.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
         self.giris.clicked.connect(self.login)
         self.kalori_hesap_buton.clicked.connect(self.kalori_hesapla)
-        self.kalori_veri_buton.clicked.connect(self.veri_goster)
+        self.kalori_veri_buton.clicked.connect(self.sayac_verileri)
+        self.apartman_aidat_buton.clicked.connect(self.apartman_aidat)
         self.tum_borclar_buton.clicked.connect(self.print_all)
 
     def login(self):
@@ -65,7 +66,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
 
         response = self.opener.open("https://app.biyos.net/login.php", login_data)
 
-    def veri_goster(self):
+    def sayac_verileri(self):
         su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
         self.su_toplam = self.get_sayac_toplam(su)
         self.su_toplam_disp.setText(str(self.su_toplam))
@@ -78,19 +79,24 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.kalori_ortalama_disp.setText(str("%.2f" % self.kalori_ortalama))
 
     def kalori_hesapla(self):
-        self.veri_goster()
+        self.sayac_verileri()
         self.dogalgaz_birim = float(self.dogalgaz_birim_in.value())
         self.su_birim = float(self.su_birim_in.value())
         self.fatura = float(self.fatura_in.value())
         su_fark = (self.dogalgaz_birim - self.su_birim)*self.su_toplam
 
         self.son_fiyat = self.fatura - su_fark
-        self.son_fiyat_disp.setText(str("%.4f" % self.son_fiyat))
+        self.son_fiyat_disp.setText(str("%.2f" % self.son_fiyat))
 
-    def get_sayac_toplam(self, html):
+    def _get_tuketim(self, html):
         table = html.body.find('table', attrs={'class': 'table'})
         body = table.find('tbody')
         rows = body.find_all('tr')
+
+        return rows
+
+    def get_sayac_toplam(self, html):
+        rows = self._get_tuketim
 
         total = 0
         for r in rows:
@@ -105,6 +111,16 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             return BeautifulSoup(resp.read(), "lxml")
         except Exception as e:
             raise e
+
+    def apartman_aidat(self, url=295):
+        su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
+        kalori = self.get_page('https://app.biyos.net/raporlar/paylasimlar/' + str(url))
+        title = kalori.body.find('h4', attrs={'class': 'pull-left'}).get_text().split(' ay')[0]
+        print title
+
+        su_rows = self._get_tuketim(su)
+        kalori_rows = self._get_tuketim(kalori)
+
 
     def print_single_account(self, no, blok, daire):
         html = self.get_page('https://app.biyos.net/hesaplar/' + str(no))

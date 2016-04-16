@@ -26,7 +26,7 @@
     <string>Tüm kişisel borçları yazdır</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="apartman_aidat">
+  <widget class="QPushButton" name="apartman_aidat_buton">
    <property name="geometry">
     <rect>
      <x>50</x>
@@ -457,13 +457,6 @@
      <bool>false</bool>
     </property>
    </widget>
-   <zorder>kalori_hesap_buton</zorder>
-   <zorder>kalori_veri_buton</zorder>
-   <zorder>verticalLayoutWidget</zorder>
-   <zorder>groupBox_3</zorder>
-   <zorder>groupBox_4</zorder>
-   <zorder>label_5</zorder>
-   <zorder>son_fiyat_disp</zorder>
   </widget>
  </widget>
  <resources/>

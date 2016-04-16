@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'biyos.ui'
 #
-# Created: Fri Apr 15 16:07:04 2016
+# Created: Sat Apr 16 11:30:12 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -30,9 +30,9 @@ class Ui_MainWindow(object):
         self.tum_borclar_buton = QtGui.QPushButton(MainWindow)
         self.tum_borclar_buton.setGeometry(QtCore.QRect(240, 450, 181, 61))
         self.tum_borclar_buton.setObjectName(_fromUtf8("tum_borclar_buton"))
-        self.apartman_aidat = QtGui.QPushButton(MainWindow)
-        self.apartman_aidat.setGeometry(QtCore.QRect(50, 450, 171, 61))
-        self.apartman_aidat.setObjectName(_fromUtf8("apartman_aidat"))
+        self.apartman_aidat_buton = QtGui.QPushButton(MainWindow)
+        self.apartman_aidat_buton.setGeometry(QtCore.QRect(50, 450, 171, 61))
+        self.apartman_aidat_buton.setObjectName(_fromUtf8("apartman_aidat_buton"))
         self.frame = QtGui.QFrame(MainWindow)
         self.frame.setGeometry(QtCore.QRect(50, 520, 371, 111))
         self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -171,7 +171,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "Form", None))
         self.tum_borclar_buton.setText(_translate("MainWindow", "Tüm kişisel borçları yazdır", None))
-        self.apartman_aidat.setText(_translate("MainWindow", "Aidat borçlarını yazdır", None))
+        self.apartman_aidat_buton.setText(_translate("MainWindow", "Aidat borçlarını yazdır", None))
         self.groupBox.setTitle(_translate("MainWindow", "Tek borç yazdır", None))
         self.radioA.setText(_translate("MainWindow", "A blok", None))
         self.radioB.setText(_translate("MainWindow", "B blok", None))
