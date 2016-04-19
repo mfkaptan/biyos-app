@@ -9,6 +9,7 @@ import re
 from docx import Document, text, table
 from docx.enum.section import WD_SECTION
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from openpyxl import Workbook
 
 from PyQt4 import QtGui
 from bs4 import BeautifulSoup
@@ -22,6 +23,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
     def __init__(self, parent=None):
         super(BiyosApp, self).__init__(parent)
         self.setupUi(self)
+        self.dogalgaz_birim_in.setValue(11)
+        self.su_birim_in.setValue(5)
 
         self.document = None
         self.giris.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
@@ -96,7 +99,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         return rows
 
     def get_sayac_toplam(self, html):
-        rows = self._get_tuketim
+        rows = self._get_tuketim(html)
 
         total = 0
         for r in rows:
@@ -112,14 +115,42 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         except Exception as e:
             raise e
 
-    def apartman_aidat(self, url=295):
+    def apartman_aidat(self):
+        url = str(295)
         su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
-        kalori = self.get_page('https://app.biyos.net/raporlar/paylasimlar/' + str(url))
-        title = kalori.body.find('h4', attrs={'class': 'pull-left'}).get_text().split(' ay')[0]
-        print title
+        kalori = self.get_page('https://app.biyos.net/raporlar/paylasimlar/' + url)
+        section = kalori.body.find('section', attrs={'class': 'rapor'})
+        title = section.find('h4', attrs={'class': 'pull-left'}).get_text().split(' ay')[0]
 
         su_rows = self._get_tuketim(su)
         kalori_rows = self._get_tuketim(kalori)
+
+        try:
+            self.wb = Workbook()
+            ws = self.wb.active
+            ws.merge_cells('A1:I1')
+            ws['A1'] = 'Etlik Trio Evleri ' + title + ' Daire Odemeleri'
+
+            # tbl = self.document.add_table(rows=0, cols=9)
+            ws['A2'] = "Daire"
+            ws['B2'] = "A - Blok"
+            ws['C2'] = "Sicak Su Kullanilan"
+            ws['D2'] = "Sicak Su TL"
+            ws['E2'] = "Dogal Gaz Kullanilan"
+            ws['F2'] = "Dogal Gaz TL"
+            ws['G2'] = "%30 Dogal Gaz Ortak Gelir"
+            ws['H2'] = title + " Aidat"
+            ws['I2'] = "TOPLAM"
+
+            self.wb.save(filename = 'Aidat.xlsx')
+
+        except Exception as e:
+            print e
+            self.apartman_aidat_buton.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
+            self.apartman_aidat_buton.setText('Yazdirma basarisiz!')
+        else:
+            self.apartman_aidat_buton.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
+            self.apartman_aidat_buton.setText('Aidat.docx dosyasina yazdirildi!')
 
 
     def print_single_account(self, no, blok, daire):
