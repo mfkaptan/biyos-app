@@ -37,7 +37,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.tum_borclar_button.clicked.connect(self.print_all)
 
     def login(self):
-        with open('../log.in', 'r') as f:
+        with open('../static/log.in', 'r') as f:
             self.email = b64.decodestring(f.readline().strip())
             self.password = b64.decodestring(f.readline().strip())
 
@@ -158,15 +158,15 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             return
 
         try:
-            self.wb = load_workbook('Template.xlsx')
+            self.wb = load_workbook('../static/Template.xlsx')
             ws = self.wb.active
             ws.title = title
             ws['C1'] = ws['C29'] = title
             self._set_xlsx(ws, su_rows, kalori_rows)
 
-            self.wb.save(filename = title + ' ISIMLI Aidat.xlsx')
+            self.wb.save(filename = '../out/' + title + ' ISIMLI Aidat.xlsx')
             self._remove_names(ws)
-            self.wb.save(filename = title + ' ISIMSIZ Aidat.xlsx')
+            self.wb.save(filename = '../out/' + title + ' ISIMSIZ Aidat.xlsx')
 
         except Exception as e:
             print e
