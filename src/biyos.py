@@ -9,10 +9,12 @@ import re
 from docx import Document, text, table
 from docx.enum.section import WD_SECTION
 from docx.enum.table import WD_TABLE_ALIGNMENT
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles.borders import Border, Side
 
 from PyQt4 import QtGui
 from bs4 import BeautifulSoup
+from math import ceil
 
 # No, Blok, Daire
 kiraci = [ [7710, "B", 6],
@@ -70,6 +72,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         response = self.opener.open("https://app.biyos.net/login.php", login_data)
 
     def sayac_verileri(self):
+        self.dogalgaz_birim = float(self.dogalgaz_birim_in.value())
+        self.su_birim = float(self.su_birim_in.value())
         su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
         self.su_toplam = self.get_sayac_toplam(su)
         self.su_toplam_disp.setText(str(self.su_toplam))
@@ -86,8 +90,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
 
     def kalori_hesapla(self):
         self.sayac_verileri()
-        dogalgaz_birim = float(self.dogalgaz_birim_in.value())
-        su_birim = float(self.su_birim_in.value())
+        self.dogalgaz_birim = float(self.dogalgaz_birim_in.value())
+        self.su_birim = float(self.su_birim_in.value())
         fatura = float(self.fatura_in.value())
 
         if fatura == 0:
@@ -132,46 +136,73 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             return
 
     def apartman_aidat(self):
+        self.sayac_verileri()
         url = 'https://app.biyos.net/raporlar/paylasimlar/' + str(self.paylasim_link_in.value())
         su_rows = []
         kalori_rows = []
+        title = ""
         try:
             kalori = self.get_page(url)
             su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
             section = kalori.body.find('section', attrs={'class': 'rapor'})
-            title = section.find('h4', attrs={'class': 'pull-left'}).get_text().split(' ay')[0]
+            title = section.find('h4', attrs={'class': 'pull-left'}).get_text()
+            yil = title.split('-')[0].strip()
+            ay = title.split('-')[1].strip().split(' ')[0].strip()
+            title = yil + ' - ' + ay
             su_rows = self._get_tuketim(su)
             kalori_rows = self._get_tuketim(kalori)
-        except:
+        except Exception as e:
+            print e
             self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
             self.apartman_aidat_button.setText('Yazdirma basarisiz, linki kontrol edin!')
             return
 
         try:
-            self.wb = Workbook()
+            self.wb = load_workbook('Template.xlsx')
             ws = self.wb.active
-            ws.merge_cells('A1:I1')
-            ws['A1'] = 'Etlik Trio Evleri ' + title + ' Daire Odemeleri'
+            ws.title = title
+            ws['C1'] = ws['C29'] = title
+            self._set_xlsx(ws, su_rows, kalori_rows)
 
-            # tbl = self.document.add_table(rows=0, cols=9)
-            ws['A2'] = "Daire"
-            ws['B2'] = "A - Blok"
-            ws['C2'] = "Sicak Su Kullanilan"
-            ws['D2'] = "Sicak Su TL"
-            ws['E2'] = "Dogal Gaz Kullanilan"
-            ws['F2'] = "Dogal Gaz TL"
-            ws['G2'] = "%30 Dogal Gaz Ortak Gelir"
-            ws['H2'] = title + " Aidat"
-            ws['I2'] = "TOPLAM"
+            self.wb.save(filename = title + ' ISIMLI Aidat.xlsx')
+            self._remove_names(ws)
+            self.wb.save(filename = title + ' ISIMSIZ Aidat.xlsx')
 
-            self.wb.save(filename = 'Aidat.xlsx')
-
-        except:
+        except Exception as e:
+            print e
             self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
             self.apartman_aidat_button.setText('Yazdirma basarisiz!')
         else:
             self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
             self.apartman_aidat_button.setText('Aidat.xlsx dosyasina yazdirildi!')
+
+
+    def _remove_names(self, ws):
+        for i in range(4, 28):
+            ws.cell(row=i, column=2).value = 'NO LU Daire'
+            ws.cell(row=i+28, column=2).value = 'NO LU Daire'
+
+    def _set_xlsx(self, ws, su, kalori):
+        for i in range(48):
+            r = i+4
+            if i >= 24:
+                r += 4
+
+            col = su[i].find_all('td')
+            ws.cell(row=r, column=2).value = col[2].text
+            ws.cell(row=r, column=3).value = int(col[5].text)
+            ws.cell(row=r, column=4).value = su_tl = self.dogalgaz_birim*int(col[5].text)
+
+
+            col = kalori[i].find_all('td')
+            ws.cell(row=r, column=5).value = float(col[6].text.replace(',','.'))
+            ws.cell(row=r, column=6).value = d70 = float(col[8].text.replace(',','.'))
+            ws.cell(row=r, column=7).value = d30 = float(col[7].text.replace(',','.'))
+
+            aidat = 200. - d30
+            ws.cell(row=r, column=8).value = aidat
+            total = su_tl + d70 + d30 + aidat
+            ws.cell(row=r, column=9).value = ceil(total)
 
 
     def print_single_account(self, no, blok, daire):

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'biyos.ui'
 #
-# Created: Tue Apr 19 16:43:08 2016
+# Created: Fri Apr 22 00:59:57 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
