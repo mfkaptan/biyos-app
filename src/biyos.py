@@ -9,9 +9,12 @@ import re
 from docx import Document, text, table
 from docx.enum.section import WD_SECTION
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles.borders import Border, Side
 
 from PyQt4 import QtGui
 from bs4 import BeautifulSoup
+from math import ceil
 
 # No, Blok, Daire
 kiraci = [ [7710, "B", 6],
@@ -22,14 +25,16 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
     def __init__(self, parent=None):
         super(BiyosApp, self).__init__(parent)
         self.setupUi(self)
+        self.dogalgaz_birim_in.setValue(11)
+        self.su_birim_in.setValue(5)
 
         self.document = None
-        self.giris.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
-        self.giris.clicked.connect(self.login)
-        self.kalori_hesap_buton.clicked.connect(self.kalori_hesapla)
-        self.kalori_veri_buton.clicked.connect(self.sayac_verileri)
-        self.apartman_aidat_buton.clicked.connect(self.apartman_aidat)
-        self.tum_borclar_buton.clicked.connect(self.print_all)
+        self.giris_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
+        self.giris_button.clicked.connect(self.login)
+        self.kalori_hesap_button.clicked.connect(self.kalori_hesapla)
+        self.sayac_veri_button.clicked.connect(self.sayac_verileri)
+        self.apartman_aidat_button.clicked.connect(self.apartman_aidat)
+        self.tum_borclar_button.clicked.connect(self.print_all)
 
     def login(self):
         with open('../log.in', 'r') as f:
@@ -52,8 +57,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         # need this twice - once to set cookies, once to log in...
         self._login()
         self._login()
-        self.giris.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
-        self.giris.setText(self.email + ' adresi ile giris yapildi!')
+        self.giris_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
+        self.giris_button.setText(self.email + ' adresi ile giris yapildi!')
 
     def _login(self):
         """
@@ -67,6 +72,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         response = self.opener.open("https://app.biyos.net/login.php", login_data)
 
     def sayac_verileri(self):
+        self.dogalgaz_birim = float(self.dogalgaz_birim_in.value())
+        self.su_birim = float(self.su_birim_in.value())
         su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
         self.su_toplam = self.get_sayac_toplam(su)
         self.su_toplam_disp.setText(str(self.su_toplam))
@@ -78,15 +85,30 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.kalori_ortalama = self.kalori_toplam/48.0
         self.kalori_ortalama_disp.setText(str("%.2f" % self.kalori_ortalama))
 
+        self.sayac_veri_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
+        self.sayac_veri_button.setText('Veirler gosteriliyor')
+
     def kalori_hesapla(self):
         self.sayac_verileri()
         self.dogalgaz_birim = float(self.dogalgaz_birim_in.value())
         self.su_birim = float(self.su_birim_in.value())
-        self.fatura = float(self.fatura_in.value())
-        su_fark = (self.dogalgaz_birim - self.su_birim)*self.su_toplam
+        fatura = float(self.fatura_in.value())
 
-        self.son_fiyat = self.fatura - su_fark
-        self.son_fiyat_disp.setText(str("%.2f" % self.son_fiyat))
+        if fatura == 0:
+            self.kalori_hesap_button.setStyleSheet('QPushButton {background-color: #FF0000; color: black;}')
+            self.kalori_hesap_button.setText('Fatura girip tekrar deneyin!')
+            return
+
+        su_fark = (dogalgaz_birim - su_birim)*self.su_toplam
+        son_fiyat = fatura - su_fark
+        self.son_fiyat_disp.setText(str("%.2f" % son_fiyat))
+        ortak_gider = (son_fiyat * 3.)/480.
+        aidat = 200. - ortak_gider
+        self.ortak_gider_disp.setText(str("%.2f" % ortak_gider))
+        self.aidat_disp.setText(str("%.2f" % aidat))
+
+        self.kalori_hesap_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
+        self.kalori_hesap_button.setText('Hesaplandi!')
 
     def _get_tuketim(self, html):
         table = html.body.find('table', attrs={'class': 'table'})
@@ -96,7 +118,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         return rows
 
     def get_sayac_toplam(self, html):
-        rows = self._get_tuketim
+        rows = self._get_tuketim(html)
 
         total = 0
         for r in rows:
@@ -111,15 +133,76 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             return BeautifulSoup(resp.read(), "lxml")
         except Exception as e:
             raise e
+            return
 
-    def apartman_aidat(self, url=295):
-        su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
-        kalori = self.get_page('https://app.biyos.net/raporlar/paylasimlar/' + str(url))
-        title = kalori.body.find('h4', attrs={'class': 'pull-left'}).get_text().split(' ay')[0]
-        print title
+    def apartman_aidat(self):
+        self.sayac_verileri()
+        url = 'https://app.biyos.net/raporlar/paylasimlar/' + str(self.paylasim_link_in.value())
+        su_rows = []
+        kalori_rows = []
+        title = ""
+        try:
+            kalori = self.get_page(url)
+            su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
+            section = kalori.body.find('section', attrs={'class': 'rapor'})
+            title = section.find('h4', attrs={'class': 'pull-left'}).get_text()
+            yil = title.split('-')[0].strip()
+            ay = title.split('-')[1].strip().split(' ')[0].strip()
+            title = yil + ' - ' + ay
+            su_rows = self._get_tuketim(su)
+            kalori_rows = self._get_tuketim(kalori)
+        except Exception as e:
+            print e
+            self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
+            self.apartman_aidat_button.setText('Yazdirma basarisiz, linki kontrol edin!')
+            return
 
-        su_rows = self._get_tuketim(su)
-        kalori_rows = self._get_tuketim(kalori)
+        try:
+            self.wb = load_workbook('Template.xlsx')
+            ws = self.wb.active
+            ws.title = title
+            ws['C1'] = ws['C29'] = title
+            self._set_xlsx(ws, su_rows, kalori_rows)
+
+            self.wb.save(filename = title + ' ISIMLI Aidat.xlsx')
+            self._remove_names(ws)
+            self.wb.save(filename = title + ' ISIMSIZ Aidat.xlsx')
+
+        except Exception as e:
+            print e
+            self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
+            self.apartman_aidat_button.setText('Yazdirma basarisiz!')
+        else:
+            self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
+            self.apartman_aidat_button.setText('Aidat.xlsx dosyasina yazdirildi!')
+
+
+    def _remove_names(self, ws):
+        for i in range(4, 28):
+            ws.cell(row=i, column=2).value = 'NO LU Daire'
+            ws.cell(row=i+28, column=2).value = 'NO LU Daire'
+
+    def _set_xlsx(self, ws, su, kalori):
+        for i in range(48):
+            r = i+4
+            if i >= 24:
+                r += 4
+
+            col = su[i].find_all('td')
+            ws.cell(row=r, column=2).value = col[2].text
+            ws.cell(row=r, column=3).value = int(col[5].text)
+            ws.cell(row=r, column=4).value = su_tl = self.dogalgaz_birim*int(col[5].text)
+
+
+            col = kalori[i].find_all('td')
+            ws.cell(row=r, column=5).value = float(col[6].text.replace(',','.'))
+            ws.cell(row=r, column=6).value = d70 = float(col[8].text.replace(',','.'))
+            ws.cell(row=r, column=7).value = d30 = float(col[7].text.replace(',','.'))
+
+            aidat = 200. - d30
+            ws.cell(row=r, column=8).value = aidat
+            total = su_tl + d70 + d30 + aidat
+            ws.cell(row=r, column=9).value = ceil(total)
 
 
     def print_single_account(self, no, blok, daire):
