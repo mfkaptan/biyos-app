@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'biyos.ui'
 #
-# Created: Fri Apr 22 00:59:57 2016
+# Created: Sat Apr 23 22:19:05 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -213,19 +213,22 @@ class Ui_MainWindow(object):
         self.b_blok_in = QtGui.QRadioButton(self.groupBox)
         self.b_blok_in.setGeometry(QtCore.QRect(80, 20, 81, 51))
         self.b_blok_in.setObjectName(_fromUtf8("b_blok_in"))
-        self.tekil_borc_button = QtGui.QPushButton(self.groupBox)
-        self.tekil_borc_button.setGeometry(QtCore.QRect(180, 30, 161, 61))
-        self.tekil_borc_button.setObjectName(_fromUtf8("tekil_borc_button"))
-        self.daire_no_in = QtGui.QLineEdit(self.groupBox)
-        self.daire_no_in.setGeometry(QtCore.QRect(80, 60, 91, 32))
-        self.daire_no_in.setObjectName(_fromUtf8("daire_no_in"))
+        self.tek_borc_button = QtGui.QPushButton(self.groupBox)
+        self.tek_borc_button.setGeometry(QtCore.QRect(180, 30, 161, 61))
+        self.tek_borc_button.setObjectName(_fromUtf8("tek_borc_button"))
         self.label = QtGui.QLabel(self.groupBox)
         self.label.setGeometry(QtCore.QRect(10, 60, 71, 31))
         self.label.setObjectName(_fromUtf8("label"))
+        self.daire_no_in = QtGui.QDoubleSpinBox(self.groupBox)
+        self.daire_no_in.setGeometry(QtCore.QRect(80, 60, 71, 31))
+        self.daire_no_in.setDecimals(0)
+        self.daire_no_in.setMinimum(1.0)
+        self.daire_no_in.setMaximum(24.0)
+        self.daire_no_in.setObjectName(_fromUtf8("daire_no_in"))
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -252,7 +255,7 @@ class Ui_MainWindow(object):
         self.groupBox.setTitle(_translate("MainWindow", "Tek borç yazdır", None))
         self.a_blok_in.setText(_translate("MainWindow", "A blok", None))
         self.b_blok_in.setText(_translate("MainWindow", "B blok", None))
-        self.tekil_borc_button.setText(_translate("MainWindow", "Yazdır", None))
+        self.tek_borc_button.setText(_translate("MainWindow", "Yazdır", None))
         self.label.setText(_translate("MainWindow", "Daire No:", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Daire Borç Tablosu", None))
 

@@ -6,19 +6,16 @@ import biyosui
 import base64 as b64
 import re
 
-from docx import Document, text, table
-from docx.enum.section import WD_SECTION
-from docx.enum.table import WD_TABLE_ALIGNMENT
-from openpyxl import Workbook, load_workbook
-from openpyxl.styles.borders import Border, Side
+from docx import Document
+from docx.shared import Inches
+from openpyxl import load_workbook
 
 from PyQt4 import QtGui
 from bs4 import BeautifulSoup
 from math import ceil
 
 # No, Blok, Daire
-kiraci = [ [7710, "B", 6],
-         ]
+kiraci = [[7710, "A", 6]]
 
 
 class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
@@ -28,13 +25,12 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.dogalgaz_birim_in.setValue(11)
         self.su_birim_in.setValue(5)
 
-        self.document = None
-        self.giris_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
-        self.giris_button.clicked.connect(self.login)
-        self.kalori_hesap_button.clicked.connect(self.kalori_hesapla)
+        self.kalori_hesap_button.clicked.connect(self.kalori_hesap)
         self.sayac_veri_button.clicked.connect(self.sayac_verileri)
         self.apartman_aidat_button.clicked.connect(self.apartman_aidat)
-        self.tum_borclar_button.clicked.connect(self.print_all)
+        self.tum_borclar_button.clicked.connect(self.tum_borclar)
+        self.tek_borc_button.clicked.connect(self.tek_borc)
+        self.login()
 
     def login(self):
         with open('../static/log.in', 'r') as f:
@@ -49,10 +45,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             urllib2.HTTPCookieProcessor(self.cj)
         )
 
-        self.opener.addheaders = [
-            ('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
-                           'Windows NT 5.2; .NET CLR 1.1.4322)'))
-        ]
+        self.opener.addheaders = [('User-agent', ('Mozilla/4.0 (compatible; MSIE 6.0; '
+                                                  'Windows NT 5.2; .NET CLR 1.1.4322)'))]
 
         # need this twice - once to set cookies, once to log in...
         self._login()
@@ -88,7 +82,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.sayac_veri_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
         self.sayac_veri_button.setText('Veirler gosteriliyor')
 
-    def kalori_hesapla(self):
+    def kalori_hesap(self):
         self.sayac_verileri()
         self.dogalgaz_birim = float(self.dogalgaz_birim_in.value())
         self.su_birim = float(self.su_birim_in.value())
@@ -99,7 +93,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             self.kalori_hesap_button.setText('Fatura girip tekrar deneyin!')
             return
 
-        su_fark = (dogalgaz_birim - su_birim)*self.su_toplam
+        su_fark = (self.dogalgaz_birim - self.su_birim)*self.su_toplam
         son_fiyat = fatura - su_fark
         self.son_fiyat_disp.setText(str("%.2f" % son_fiyat))
         ortak_gider = (son_fiyat * 3.)/480.
@@ -110,15 +104,18 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.kalori_hesap_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
         self.kalori_hesap_button.setText('Hesaplandi!')
 
-    def _get_tuketim(self, html):
-        table = html.body.find('table', attrs={'class': 'table'})
+    def _get_rows(self, html, attr=None):
+        if attr is None:
+            attr = "table"
+
+        table = html.find('table', attrs={'class': attr})
         body = table.find('tbody')
         rows = body.find_all('tr')
 
         return rows
 
     def get_sayac_toplam(self, html):
-        rows = self._get_tuketim(html)
+        rows = self._get_rows(html)
 
         total = 0
         for r in rows:
@@ -144,13 +141,13 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         try:
             kalori = self.get_page(url)
             su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
-            section = kalori.body.find('section', attrs={'class': 'rapor'})
+            section = kalori.body.find('section', attrs={'class':  'rapor'})
             title = section.find('h4', attrs={'class': 'pull-left'}).get_text()
             yil = title.split('-')[0].strip()
             ay = title.split('-')[1].strip().split(' ')[0].strip()
             title = yil + ' - ' + ay
-            su_rows = self._get_tuketim(su)
-            kalori_rows = self._get_tuketim(kalori)
+            su_rows = self._get_rows(su)
+            kalori_rows = self._get_rows(kalori)
         except Exception as e:
             print e
             self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
@@ -158,7 +155,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             return
 
         try:
-            self.wb = load_workbook('../static/Template.xlsx')
+            self.wb = load_workbook('../template/aidat.xlsx')
             ws = self.wb.active
             ws.title = title
             ws['C1'] = ws['C29'] = title
@@ -193,50 +190,43 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             ws.cell(row=r, column=3).value = int(col[5].text)
             ws.cell(row=r, column=4).value = su_tl = self.dogalgaz_birim*int(col[5].text)
 
-
             col = kalori[i].find_all('td')
-            ws.cell(row=r, column=5).value = float(col[6].text.replace(',','.'))
-            ws.cell(row=r, column=6).value = d70 = float(col[8].text.replace(',','.'))
-            ws.cell(row=r, column=7).value = d30 = float(col[7].text.replace(',','.'))
+            ws.cell(row=r, column=5).value = float(col[6].text.replace(',', '.'))
+            ws.cell(row=r, column=6).value = d70 = float(col[8].text.replace(',', '.'))
+            ws.cell(row=r, column=7).value = d30 = float(col[7].text.replace(',', '.'))
 
             aidat = 200. - d30
             ws.cell(row=r, column=8).value = aidat
             total = su_tl + d70 + d30 + aidat
             ws.cell(row=r, column=9).value = ceil(total)
 
-
-    def print_single_account(self, no, blok, daire):
+    def _single_account(self, no, blok, daire):
         html = self.get_page('https://app.biyos.net/hesaplar/' + str(no))
-        hesap =  html.body.find('span', attrs={'style':'font-size:22px;'}).get_text()
+        hesap =  html.body.find('span', attrs={'style': 'font-size:22px;'}).get_text()
 
-        p1 = self.document.add_paragraph()
-        p1.style.paragraph_format.keep_together = True
-        p1.style.paragraph_format.keep_with_next = True
-        p1.style.paragraph_format.widow_control = True
-        self.document.add_heading(hesap, level=1)
-        self.document.add_heading(blok + " Blok / No: " + str(daire), level=2)
+        head = self.document.add_heading(hesap, level=1)
+        head.style.paragraph_format.keep_together = True
+        head.style.paragraph_format.keep_with_next = True
+        head = self.document.add_heading(blok + " Blok / No: " + str(daire), level=2)
+        head.style.paragraph_format.keep_together = True
+        head.style.paragraph_format.keep_with_next = True
 
         try:
-            data = html.body.find('div', attrs={'class':'table-responsive'})
-            geciken = html.body.find('div', attrs={'class':'detail-payment-item text-danger big-title'})
-            bakiye = html.body.find('div', attrs={'class':'detail-payment-item text-warning big-title'})
+            data = html.body.find('div', attrs={'class': 'table-responsive'})
+            geciken = html.body.find('div', attrs={'class': 'detail-payment-item text-danger big-title'})
+            bakiye = html.body.find('div', attrs={'class': 'detail-payment-item text-warning big-title'})
             tablo = self.create_table(data, geciken, bakiye)
         except AttributeError:
             return
 
     def create_table(self, data, geciken, bakiye):
-        p = self.document.add_paragraph()
-        p.style.paragraph_format.keep_together = True
-
         if bakiye:
-            table = data.find('table', attrs={'class':'table table-detail'})
-            table_body = table.find('tbody')
-            rows = table_body.find_all('tr')
+            rows = self._get_rows(data, attr='table table-detail')
 
             tbl = self.document.add_table(rows=0, cols=3)
-            tbl.autofit = True
-            tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
+            tbl.autofit = False
             tbl.style.paragraph_format.keep_together = True
+            tbl.style.paragraph_format.keep_with_next = True
             tbl.style.paragraph_format.widow_control = True
 
             row_cells = tbl.add_row().cells
@@ -256,37 +246,76 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             non_decimal = re.compile(r'[^\d.,]+')
 
             row_cells = tbl.add_row().cells
-            row_cells[1].text =  "Toplam Borc"
-            row_cells[2].text = non_decimal.sub('',bakiye.get_text())
+            row_cells[1].text = "Toplam Borc"
+            row_cells[2].text = non_decimal.sub('', bakiye.get_text())
+
+            tbl.columns[0].width = Inches(1.5)
+            tbl.columns[1].width = Inches(3.5)
+            tbl.columns[2].width = Inches(1)
 
         else:
             self.document.add_heading("Odenmemis borcunuz bulunmamaktadir.", level=3)
             self.document.add_heading("Gosterdiginiz hassasiyet icin tesekkur ederiz.", level=4)
 
-    def print_all(self):
-        self.tum_borclar.setText('Yazdiriliyor, lutfen bekleyin...')
+    def tek_borc(self):
+        blok = None
+        d = 0
+        if self.a_blok_in.isChecked():
+            d = 0
+            blok = "A"
+        elif self.b_blok_in.isChecked():
+            d = 24
+            blok = "B"
+        else:
+            self.tek_borc_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
+            self.tek_borc_button.setText('Blok seciniz!')
+            return
+
+        daire = int(self.daire_no_in.value())
+        hesap = daire + 6148 + d
+        yazdir = [[hesap, blok, daire]]
+        for k in kiraci:
+            if k[1] == blok and k[2] == daire:
+                yazdir.append(k)
+
+        try:
+            self.document = Document()
+            for d in yazdir:
+                self._single_account(*d)
+                self.document.save('../out/' + d[1] + '-' + str(d[2]) + ' borc.docx')
+        except Exception as e:
+            print e
+            self.tek_borc_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
+            self.tek_borc_button.setText('Yazdirma basarisiz!')
+        else:
+            self.tek_borc_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
+            self.tek_borc_button.setText('Basarili!\nBaska Yazdir')
+
+
+    def tum_borclar(self):
+        self.tum_borclar_button.setText('Yazdiriliyor, lutfen bekleyin...')
 
         try:
             self.document = Document()
 
-            bar = "".join(['_']*78)
+            bar = "".join(['_'] * 78)
 
             daire = 1
             blok = "A"
             for i in range(6149, 6197):
+                print blok, daire
+
                 p = self.document.add_paragraph()
+                p.add_run(bar).bold = True
                 p.style.paragraph_format.keep_together = True
                 p.style.paragraph_format.keep_with_next = True
-                p.add_run(bar).bold = True
 
-                self.print_single_account(i, blok, daire)
+                self._single_account(i, blok, daire)
 
                 daire += 1
                 if daire == 25:
                     daire = 1
                     blok = "B"
-
-                print blok, daire
 
             for k in kiraci:
                 p = self.document.add_paragraph()
@@ -294,17 +323,17 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
                 p.style.paragraph_format.keep_with_next = True
                 p.add_run(bar).bold = True
 
-                self.print_single_account(*k)
+                self._single_account(*k)
 
-            self.document.save('Tum borclar.docx')
+            self.document.save('../out/Tum borclar.docx')
 
         except Exception as e:
             print e
-            self.tum_borclar.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
-            self.tum_borclar.setText('Yazdirma basarisiz!')
+            self.tum_borclar_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
+            self.tum_borclar_button.setText('Yazdirma basarisiz!')
         else:
-            self.tum_borclar.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
-            self.tum_borclar.setText('Tum borclar.html dosyasina yazdirildi!')
+            self.tum_borclar_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
+            self.tum_borclar_button.setText('Yazdirma basarili!')
 
 def main():
     app = QtGui.QApplication(sys.argv)
