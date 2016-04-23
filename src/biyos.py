@@ -59,8 +59,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         Handle login. This should populate our cookie jar.
         """
         login_data = urllib.urlencode({
-            'email' : self.email,
-            'password' : self.password,
+            'email': self.email,
+            'password': self.password,
         })
 
         response = self.opener.open("https://app.biyos.net/login.php", login_data)
@@ -76,7 +76,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.kalori_toplam = self.get_sayac_toplam(kalori)
         self.kalori_toplam_disp.setText(str(self.kalori_toplam))
 
-        self.kalori_ortalama = self.kalori_toplam/48.0
+        self.kalori_ortalama = self.kalori_toplam / 48.0
         self.kalori_ortalama_disp.setText(str("%.2f" % self.kalori_ortalama))
 
         self.sayac_veri_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
@@ -93,10 +93,10 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             self.kalori_hesap_button.setText('Fatura girip tekrar deneyin!')
             return
 
-        su_fark = (self.dogalgaz_birim - self.su_birim)*self.su_toplam
+        su_fark = (self.dogalgaz_birim - self.su_birim) * self.su_toplam
         son_fiyat = fatura - su_fark
         self.son_fiyat_disp.setText(str("%.2f" % son_fiyat))
-        ortak_gider = (son_fiyat * 3.)/480.
+        ortak_gider = (son_fiyat * 3.) / 480.
         aidat = 200. - ortak_gider
         self.ortak_gider_disp.setText(str("%.2f" % ortak_gider))
         self.aidat_disp.setText(str("%.2f" % aidat))
@@ -141,7 +141,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         try:
             kalori = self.get_page(url)
             su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
-            section = kalori.body.find('section', attrs={'class':  'rapor'})
+            section = kalori.body.find('section', attrs={'class': 'rapor'})
             title = section.find('h4', attrs={'class': 'pull-left'}).get_text()
             yil = title.split('-')[0].strip()
             ay = title.split('-')[1].strip().split(' ')[0].strip()
@@ -161,9 +161,9 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             ws['C1'] = ws['C29'] = title
             self._set_xlsx(ws, su_rows, kalori_rows)
 
-            self.wb.save(filename = '../out/' + title + ' ISIMLI Aidat.xlsx')
+            self.wb.save(filename='../out/' + title + ' ISIMLI Aidat.xlsx')
             self._remove_names(ws)
-            self.wb.save(filename = '../out/' + title + ' ISIMSIZ Aidat.xlsx')
+            self.wb.save(filename='../out/' + title + ' ISIMSIZ Aidat.xlsx')
 
         except Exception as e:
             print e
@@ -171,8 +171,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             self.apartman_aidat_button.setText('Yazdirma basarisiz!')
         else:
             self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
-            self.apartman_aidat_button.setText('Aidat.xlsx dosyasina yazdirildi!')
-
+            self.apartman_aidat_button.setText(title + ' Yazdirildi!')
 
     def _remove_names(self, ws):
         for i in range(4, 28):
@@ -181,14 +180,14 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
 
     def _set_xlsx(self, ws, su, kalori):
         for i in range(48):
-            r = i+4
+            r = i + 4
             if i >= 24:
                 r += 4
 
             col = su[i].find_all('td')
             ws.cell(row=r, column=2).value = col[2].text
             ws.cell(row=r, column=3).value = int(col[5].text)
-            ws.cell(row=r, column=4).value = su_tl = self.dogalgaz_birim*int(col[5].text)
+            ws.cell(row=r, column=4).value = su_tl = self.dogalgaz_birim * int(col[5].text)
 
             col = kalori[i].find_all('td')
             ws.cell(row=r, column=5).value = float(col[6].text.replace(',', '.'))
@@ -215,7 +214,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             data = html.body.find('div', attrs={'class': 'table-responsive'})
             geciken = html.body.find('div', attrs={'class': 'detail-payment-item text-danger big-title'})
             bakiye = html.body.find('div', attrs={'class': 'detail-payment-item text-warning big-title'})
-            tablo = self.create_table(data, geciken, bakiye)
+            self.create_table(data, geciken, bakiye)
         except AttributeError:
             return
 
@@ -291,7 +290,6 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             self.tek_borc_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
             self.tek_borc_button.setText('Basarili!\nBaska Yazdir')
 
-
     def tum_borclar(self):
         self.tum_borclar_button.setText('Yazdiriliyor, lutfen bekleyin...')
 
@@ -334,6 +332,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         else:
             self.tum_borclar_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
             self.tum_borclar_button.setText('Yazdirma basarili!')
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
