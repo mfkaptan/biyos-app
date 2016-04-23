@@ -61,6 +61,6 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
-# ignore login
-/static/log.in
+# ignore
 /out
+/login/log.in
