@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'biyos.ui'
 #
-# Created: Sat Apr 23 22:19:05 2016
+# Created: Sat Apr 23 22:31:50 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -228,7 +228,7 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
