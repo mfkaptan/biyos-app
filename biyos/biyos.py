@@ -80,7 +80,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.kalori_ortalama_disp.setText(str("%.2f" % self.kalori_ortalama))
 
         self.sayac_veri_button.setStyleSheet('QPushButton {background-color: #00FF00; color: black;}')
-        self.sayac_veri_button.setText('Veirler gosteriliyor')
+        self.sayac_veri_button.setText('Veriler gosteriliyor')
 
     def kalori_hesap(self):
         self.sayac_verileri()
@@ -249,8 +249,8 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             row_cells[2].text = non_decimal.sub('', bakiye.get_text())
 
             tbl.columns[0].width = Inches(1.5)
-            tbl.columns[1].width = Inches(3.5)
-            tbl.columns[2].width = Inches(1)
+            tbl.columns[1].width = Inches(50)
+            tbl.columns[2].width = Inches(0.5)
 
         else:
             self.document.add_heading("Odenmemis borcunuz bulunmamaktadir.", level=3)
