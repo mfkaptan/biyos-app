@@ -33,7 +33,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.login()
 
     def login(self):
-        with open('../static/log.in', 'r') as f:
+        with open('login/log.in', 'r') as f:
             self.email = b64.decodestring(f.readline().strip())
             self.password = b64.decodestring(f.readline().strip())
 
@@ -155,15 +155,15 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             return
 
         try:
-            self.wb = load_workbook('../template/aidat.xlsx')
+            self.wb = load_workbook('aidat/template/aidat.xlsx')
             ws = self.wb.active
             ws.title = title
             ws['C1'] = ws['C29'] = title
             self._set_xlsx(ws, su_rows, kalori_rows)
 
-            self.wb.save(filename='../out/' + title + ' ISIMLI Aidat.xlsx')
+            self.wb.save(filename='aidat/' + title + ' ISIMLI Aidat.xlsx')
             self._remove_names(ws)
-            self.wb.save(filename='../out/' + title + ' ISIMSIZ Aidat.xlsx')
+            self.wb.save(filename='aidat/' + title + ' ISIMSIZ Aidat.xlsx')
 
         except Exception as e:
             print e
@@ -281,7 +281,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             self.document = Document()
             for d in yazdir:
                 self._single_account(*d)
-                self.document.save('../out/' + d[1] + '-' + str(d[2]) + ' borc.docx')
+                self.document.save('aidat/' + d[1] + '-' + str(d[2]) + ' borc.docx')
         except Exception as e:
             print e
             self.tek_borc_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
@@ -323,7 +323,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
 
                 self._single_account(*k)
 
-            self.document.save('../out/Tum borclar.docx')
+            self.document.save('aidat/Tum borclar.docx')
 
         except Exception as e:
             print e
