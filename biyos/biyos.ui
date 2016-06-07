@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>780</width>
-    <height>570</height>
+    <width>900</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QPushButton" name="giris_button">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>30</x>
      <y>10</y>
-     <width>721</width>
+     <width>861</width>
      <height>51</height>
     </rect>
    </property>
@@ -34,10 +34,10 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>20</x>
      <y>70</y>
-     <width>491</width>
-     <height>321</height>
+     <width>591</width>
+     <height>351</height>
     </rect>
    </property>
    <property name="font">
@@ -54,9 +54,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>120</y>
-      <width>471</width>
-      <height>51</height>
+      <y>150</y>
+      <width>561</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="text">
@@ -68,8 +68,8 @@
      <rect>
       <x>0</x>
       <y>20</y>
-      <width>481</width>
-      <height>91</height>
+      <width>581</width>
+      <height>121</height>
      </rect>
     </property>
     <property name="title">
@@ -78,10 +78,10 @@
     <widget class="QDoubleSpinBox" name="su_birim_in">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>30</y>
-       <width>121</width>
-       <height>51</height>
+       <x>180</x>
+       <y>40</y>
+       <width>141</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="maximum">
@@ -92,9 +92,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
-       <width>131</width>
-       <height>51</height>
+       <y>40</y>
+       <width>151</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="maximum">
@@ -105,8 +105,8 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>0</y>
-       <width>141</width>
+       <y>10</y>
+       <width>151</width>
        <height>31</height>
       </rect>
      </property>
@@ -122,8 +122,8 @@
     <widget class="QLabel" name="label_7">
      <property name="geometry">
       <rect>
-       <x>160</x>
-       <y>0</y>
+       <x>180</x>
+       <y>10</y>
        <width>141</width>
        <height>31</height>
       </rect>
@@ -140,10 +140,10 @@
     <widget class="QDoubleSpinBox" name="fatura_in">
      <property name="geometry">
       <rect>
-       <x>300</x>
-       <y>30</y>
-       <width>171</width>
-       <height>51</height>
+       <x>340</x>
+       <y>40</y>
+       <width>231</width>
+       <height>71</height>
       </rect>
      </property>
      <property name="maximum">
@@ -153,8 +153,8 @@
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>0</y>
+       <x>340</x>
+       <y>10</y>
        <width>161</width>
        <height>31</height>
       </rect>
@@ -165,7 +165,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Fatura</string>
+      <string>Faturayı Girin</string>
      </property>
     </widget>
    </widget>
@@ -173,21 +173,21 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
-      <width>271</width>
+      <y>220</y>
+      <width>291</width>
       <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string>Dağıtılacak doğal gaz (TL)</string>
+     <string>Dağıtılacak doğal gaz (TL) :</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="son_fiyat_disp">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>180</y>
-      <width>171</width>
+      <x>320</x>
+      <y>220</y>
+      <width>251</width>
       <height>51</height>
      </rect>
     </property>
@@ -207,33 +207,33 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
-      <width>101</width>
+      <y>280</y>
+      <width>141</width>
       <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string>Ortak gider</string>
+     <string>Ortak gider :</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>240</y>
-      <width>51</width>
+      <x>320</x>
+      <y>280</y>
+      <width>71</width>
       <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string>Aidat</string>
+     <string>Aidat :</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="ortak_gider_disp">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>240</y>
+      <x>160</x>
+      <y>280</y>
       <width>141</width>
       <height>51</height>
      </rect>
@@ -253,8 +253,8 @@
    <widget class="QTextEdit" name="aidat_disp">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>240</y>
+      <x>400</x>
+      <y>280</y>
       <width>171</width>
       <height>51</height>
      </rect>
@@ -275,10 +275,10 @@
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>540</x>
+     <x>630</x>
      <y>70</y>
-     <width>221</width>
-     <height>341</height>
+     <width>261</width>
+     <height>371</height>
     </rect>
    </property>
    <property name="font">
@@ -296,7 +296,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>191</width>
+      <width>241</width>
       <height>31</height>
      </rect>
     </property>
@@ -314,7 +314,7 @@
      <rect>
       <x>10</x>
       <y>190</y>
-      <width>191</width>
+      <width>241</width>
       <height>31</height>
      </rect>
     </property>
@@ -332,8 +332,8 @@
      <rect>
       <x>10</x>
       <y>60</y>
-      <width>191</width>
-      <height>41</height>
+      <width>241</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -353,8 +353,8 @@
      <rect>
       <x>10</x>
       <y>220</y>
-      <width>191</width>
-      <height>41</height>
+      <width>241</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -374,7 +374,7 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>191</width>
+      <width>241</width>
       <height>31</height>
      </rect>
     </property>
@@ -394,8 +394,8 @@
      <rect>
       <x>10</x>
       <y>140</y>
-      <width>191</width>
-      <height>41</height>
+      <width>241</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -415,8 +415,8 @@
      <rect>
       <x>10</x>
       <y>280</y>
-      <width>191</width>
-      <height>51</height>
+      <width>241</width>
+      <height>81</height>
      </rect>
     </property>
     <property name="text">
@@ -427,10 +427,10 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>400</y>
-     <width>751</width>
-     <height>161</height>
+     <x>10</x>
+     <y>440</y>
+     <width>881</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="font">
@@ -450,8 +450,8 @@
       <rect>
        <x>10</x>
        <y>70</y>
-       <width>711</width>
-       <height>51</height>
+       <width>851</width>
+       <height>81</height>
       </rect>
      </property>
      <property name="text">
@@ -463,7 +463,7 @@
       <rect>
        <x>10</x>
        <y>16</y>
-       <width>231</width>
+       <width>271</width>
        <height>31</height>
       </rect>
      </property>
@@ -481,11 +481,16 @@
     <widget class="QLabel" name="label_12">
      <property name="geometry">
       <rect>
-       <x>250</x>
-       <y>10</y>
-       <width>341</width>
-       <height>41</height>
+       <x>280</x>
+       <y>0</y>
+       <width>511</width>
+       <height>51</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
      </property>
      <property name="cursor">
       <cursorShape>PointingHandCursor</cursorShape>
@@ -497,7 +502,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://app.biyos.net/raporlar/paylasimlar/&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;https://app.biyos.net/raporlar/paylasimlar/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;https://app.biyos.net/raporlar/paylasimlar/&quot;&gt;&lt;span style=&quot; font-size:16pt; text-decoration: underline; color:#0000ff;&quot;&gt;https://app.biyos.net/raporlar/paylasimlar/&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::AutoText</enum>
@@ -512,10 +517,10 @@
     <widget class="QDoubleSpinBox" name="paylasim_link_in">
      <property name="geometry">
       <rect>
-       <x>600</x>
-       <y>10</y>
-       <width>121</width>
-       <height>41</height>
+       <x>790</x>
+       <y>0</y>
+       <width>81</width>
+       <height>61</height>
       </rect>
      </property>
      <property name="decimals">
@@ -535,8 +540,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>261</width>
-       <height>111</height>
+       <width>341</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="font">
@@ -551,10 +556,10 @@
     <widget class="QFrame" name="frame">
      <property name="geometry">
       <rect>
-       <x>290</x>
-       <y>20</y>
-       <width>441</width>
-       <height>101</height>
+       <x>360</x>
+       <y>10</y>
+       <width>511</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -566,9 +571,9 @@
      <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>0</y>
-        <width>411</width>
+        <x>10</x>
+        <y>10</y>
+        <width>481</width>
         <height>121</height>
        </rect>
       </property>
@@ -585,7 +590,7 @@
         <rect>
          <x>10</x>
          <y>20</y>
-         <width>71</width>
+         <width>81</width>
          <height>51</height>
         </rect>
        </property>
@@ -601,7 +606,7 @@
       <widget class="QRadioButton" name="b_blok_in">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>120</x>
          <y>20</y>
          <width>81</width>
          <height>51</height>
@@ -621,8 +626,8 @@
         <rect>
          <x>240</x>
          <y>20</y>
-         <width>161</width>
-         <height>81</height>
+         <width>221</width>
+         <height>91</height>
         </rect>
        </property>
        <property name="text">
@@ -633,8 +638,8 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
-         <width>71</width>
+         <y>80</y>
+         <width>101</width>
          <height>31</height>
         </rect>
        </property>
@@ -650,10 +655,10 @@
       <widget class="QDoubleSpinBox" name="daire_no_in">
        <property name="geometry">
         <rect>
-         <x>110</x>
-         <y>60</y>
-         <width>71</width>
-         <height>31</height>
+         <x>120</x>
+         <y>70</y>
+         <width>81</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="decimals">
