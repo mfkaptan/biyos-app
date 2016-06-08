@@ -134,20 +134,29 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
 
     def apartman_aidat(self):
         self.sayac_verileri()
-        url = 'https://app.biyos.net/raporlar/paylasimlar/' + str(self.paylasim_link_in.value())
+        dogalgaz_link = self.paylasim_link_in.value()
+        if dogalgaz_link != 0:
+            url = 'https://app.biyos.net/raporlar/paylasimlar/' + str(dogalgaz_link)
+        else:
+            url = None
+
         su_rows = []
         kalori_rows = []
         title = ""
         try:
-            kalori = self.get_page(url)
             su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
-            section = kalori.body.find('section', attrs={'class': 'rapor'})
-            title = section.find('h4', attrs={'class': 'pull-left'}).get_text()
-            yil = title.split('-')[0].strip()
-            ay = title.split('-')[1].strip().split(' ')[0].strip()
-            title = yil + ' - ' + ay
             su_rows = self._get_rows(su)
-            kalori_rows = self._get_rows(kalori)
+
+            if url is None:
+                title = "2016 - "
+            else:
+                kalori = self.get_page(url)
+                section = kalori.body.find('section', attrs={'class': 'rapor'})
+                title = section.find('h4', attrs={'class': 'pull-left'}).get_text()
+                yil = title.split('-')[0].strip()
+                ay = title.split('-')[1].strip().split(' ')[0].strip()
+                title = yil + ' - ' + ay
+                kalori_rows = self._get_rows(kalori)
         except Exception as e:
             print e
             self.apartman_aidat_button.setStyleSheet('QPushButton {background-color: #FF0000; color: white;}')
@@ -189,10 +198,16 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             ws.cell(row=r, column=3).value = int(col[5].text)
             ws.cell(row=r, column=4).value = su_tl = self.dogalgaz_birim * int(col[5].text)
 
-            col = kalori[i].find_all('td')
-            ws.cell(row=r, column=5).value = float(col[6].text.replace(',', '.'))
-            ws.cell(row=r, column=6).value = d70 = float(col[8].text.replace(',', '.'))
-            ws.cell(row=r, column=7).value = d30 = float(col[7].text.replace(',', '.'))
+            if len(kalori) == 0:
+                ws.cell(row=r, column=5).value = 0
+                ws.cell(row=r, column=6).value = d70 = 0
+                ws.cell(row=r, column=7).value = d30 = 0
+
+            else:
+                col = kalori[i].find_all('td')
+                ws.cell(row=r, column=5).value = float(col[6].text.replace(',', '.'))
+                ws.cell(row=r, column=6).value = d70 = float(col[8].text.replace(',', '.'))
+                ws.cell(row=r, column=7).value = d30 = float(col[7].text.replace(',', '.'))
 
             aidat = 200. - d30
             ws.cell(row=r, column=8).value = aidat
