@@ -68,11 +68,11 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
     def sayac_verileri(self):
         self.dogalgaz_birim = float(self.dogalgaz_birim_in.value())
         self.su_birim = float(self.su_birim_in.value())
-        su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
+        su = self.get_page('https://app.biyos.net/385/yonetim/sayaclar/sicaksu')
         self.su_toplam = self.get_sayac_toplam(su)
         self.su_toplam_disp.setText(str(self.su_toplam))
 
-        kalori = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=kalorimetre')
+        kalori = self.get_page('https://app.biyos.net/385/yonetim/sayaclar/kalorimetre')
         self.kalori_toplam = self.get_sayac_toplam(kalori)
         self.kalori_toplam_disp.setText(str(self.kalori_toplam))
 
@@ -136,7 +136,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         self.sayac_verileri()
         dogalgaz_link = self.paylasim_link_in.value()
         if dogalgaz_link != 0:
-            url = 'https://app.biyos.net/raporlar/paylasimlar/' + str(dogalgaz_link)
+            url = 'https://app.biyos.net/385/raporlar/paylasimlar/' + str(dogalgaz_link)
         else:
             url = None
 
@@ -144,7 +144,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
         kalori_rows = []
         title = ""
         try:
-            su = self.get_page('https://app.biyos.net/yonetim?sayac_tipi=sicaksu')
+            su = self.get_page('https://app.biyos.net/385/yonetim/sayaclar/sicaksu')
             su_rows = self._get_rows(su)
 
             if url is None:
@@ -215,7 +215,7 @@ class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
             ws.cell(row=r, column=9).value = ceil(total)
 
     def _single_account(self, no, blok, daire):
-        html = self.get_page('https://app.biyos.net/hesaplar/' + str(no))
+        html = self.get_page('https://app.biyos.net/385/hesaplar/' + str(no))
         hesap =  html.body.find('span', attrs={'style': 'font-size:22px;'}).get_text()
 
         head = self.document.add_heading(hesap, level=1)

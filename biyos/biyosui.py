@@ -272,7 +272,7 @@ class Ui_MainWindow(object):
         self.sayac_veri_button.setText(_translate("MainWindow", "Verileri göster", None))
         self.apartman_aidat_button.setText(_translate("MainWindow", "Aylık apartman borçlarını yazdır", None))
         self.label_3.setText(_translate("MainWindow", "Borç yazdırılacak ay linki:", None))
-        self.label_12.setText(_translate("MainWindow", "<html><head/><body><p><a href=\"https://app.biyos.net/raporlar/paylasimlar/\"><span style=\" font-size:16pt; text-decoration: underline; color:#0000ff;\">https://app.biyos.net/raporlar/paylasimlar/</span></a></p></body></html>", None))
+        self.label_12.setText(_translate("MainWindow", "<html><head/><body><p><a href=\"https://app.biyos.net/385/raporlar/paylasimlar/\"><span style=\" font-size:16pt; text-decoration: underline; color:#0000ff;\">https://app.biyos.net/385/raporlar/paylasimlar/</span></a></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Apartman Borç Tablosu", None))
         self.tum_borclar_button.setText(_translate("MainWindow", "Tüm kişisel borçları yazdır", None))
         self.groupBox.setTitle(_translate("MainWindow", "Tek borç yazdır", None))
