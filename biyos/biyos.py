@@ -16,14 +16,16 @@ from math import ceil
 
 # No, Blok, Daire
 kiraci = [[7710, "A", 6]]
+DOGALGAZ_BIRIM = 12.5
+SICAKSU_BIRIM = 6.25
 
 
 class BiyosApp(QtGui.QMainWindow, biyosui.Ui_MainWindow):
     def __init__(self, parent=None):
         super(BiyosApp, self).__init__(parent)
         self.setupUi(self)
-        self.dogalgaz_birim_in.setValue(11)
-        self.su_birim_in.setValue(5)
+        self.dogalgaz_birim_in.setValue(DOGALGAZ_BIRIM)
+        self.su_birim_in.setValue(SICAKSU_BIRIM)
 
         self.kalori_hesap_button.clicked.connect(self.kalori_hesap)
         self.sayac_veri_button.clicked.connect(self.sayac_verileri)
